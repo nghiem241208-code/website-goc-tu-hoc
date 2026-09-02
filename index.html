@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velorah® — Không Gian Học Tập Tĩnh Lặng</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: 'hsl(201, 100%, 13%)',
+            foreground: 'hsl(0, 0%, 100%)',
+            'muted-foreground': 'hsl(240, 4%, 66%)',
+          },
+          fontFamily: {
+            display: ['"Instrument Serif"', 'serif'],
+            body: ['"Inter"', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --font-display: 'Instrument Serif', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    textarea, input {
+      user-select: text;
+    }
+
+    /* Chuẩn hiệu ứng Liquid Glass từ Motion Site */
+    .liquid-glass {
+      background: rgba(255, 255, 255, 0.03);
+      background-blend-mode: luminosity;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: none;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.4px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 255, 255, 0.15) 20%,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.15) 80%,
+        rgba(255, 255, 255, 0.45) 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .liquid-glass-active {
+      background: rgba(255, 255, 255, 0.15) !important;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Animations */
+    @keyframes fade-rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-rise { animation: fade-rise 0.8s ease-out both; }
+    .animate-fade-rise-delay { animation: fade-rise 0.8s ease-out 0.2s both; }
+
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="w-full h-screen overflow-hidden flex flex-col relative text-foreground bg-background">
+
+  <video
+    autoplay
+    loop
+    muted
+    playsinline
+    class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4"
+  ></video>
+
+  <div class="absolute inset-0 bg-[#001726]/40 z-0 pointer-events-none"></div>
+
+  <header class="relative z-20 flex items-center justify-between px-8 py-5 w-full max-w-7xl mx-auto">
+    <div class="flex items-center gap-3">
+      <a href="#" class="text-3xl tracking-tight text-foreground select-none" style="font-family: var(--font-display);">
+        Velorah<sup class="text-xs font-normal">®</sup>
+      </a>
+      <span class="hidden sm:inline text-xs tracking-widest uppercase text-muted-foreground border-l border-white/20 pl-3">
+        Workspace
+      </span>
+    </div>
+
+    <nav id="subjectNavList" class="hidden md:flex items-center gap-1.5 overflow-x-auto max-w-[50vw] py-1 px-2 scrollbar-none"></nav>
+
+    <div class="flex items-center gap-3">
+      <button
+        onclick="openDrawer()"
+        class="liquid-glass rounded-full px-5 py-2 text-sm text-foreground hover:scale-[1.03] cursor-pointer font-medium flex items-center gap-2"
+      >
+        <span id="userBadgeText">Tài khoản</span>
+        <i data-lucide="user" class="w-3.5 h-3.5 text-muted-foreground"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="relative z-10 flex-1 px-6 sm:px-10 pb-6 overflow-hidden max-w-7xl w-full mx-auto flex flex-col gap-4 animate-fade-rise">
+    
+    <section class="liquid-glass rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl liquid-glass flex items-center justify-center text-2xl" id="subjectIconBadge">
+          📐
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl tracking-tight font-normal text-foreground flex items-center gap-2" style="font-family: var(--font-display);">
+            <span id="currentSubjectTitle">Toán học</span>
+            <em class="not-italic text-muted-foreground text-sm font-sans font-normal" id="currentSubjectSub">11</em>
+          </h2>
+          <p class="text-xs text-muted-foreground mt-0.5">Chuỗi tập trung: <span id="streakCount" class="text-foreground font-semibold">0</span> hiệp</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-2xl border border-white/10 text-xs">
+          <button onclick="adjustMinutes(-5)" class="px-2 py-0.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">-5p</button>
+          <button onclick="setCustomMinutes(25)" class="px-2 py-0.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">25p</button>
+          <button onclick="setCustomMinutes(45)" class="px-2 py-0.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">45p</button>
+          <button onclick="adjustMinutes(5)" class="px-2 py-0.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all">+5p</button>
+        </div>
+
+        <div class="flex items-center cursor-pointer group" onclick="editTimeDirectly()" title="Nhấp vào để nhập số phút tùy ý">
+          <span id="timerMinutes" class="text-4xl sm:text-5xl font-normal tracking-tight text-foreground group-hover:text-amber-300 transition-colors" style="font-family: var(--font-display);">25</span>
+          <span class="text-3xl sm:text-4xl text-muted-foreground px-1" style="font-family: var(--font-display);">:</span>
+          <span id="timerSeconds" class="text-4xl sm:text-5xl font-normal tracking-tight text-foreground group-hover:text-amber-300 transition-colors" style="font-family: var(--font-display);">00</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnToggleTimer" class="liquid-glass rounded-full px-5 py-2.5 text-xs sm:text-sm text-foreground hover:scale-[1.03] cursor-pointer font-medium flex items-center gap-1.5">
+            <i data-lucide="play" id="playIcon" class="w-3.5 h-3.5 fill-current"></i>
+            <span id="btnTimerText">Bắt đầu</span>
+          </button>
+          <button id="btnResetTimer" class="liquid-glass rounded-full p-2.5 text-muted-foreground hover:text-foreground cursor-pointer" title="Đặt lại">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex-1 grid grid-cols-12 gap-4 overflow-hidden">
+      
+      <section class="liquid-glass rounded-3xl p-5 col-span-12 lg:col-span-7 flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-foreground">Vở Ghi Chép</span>
+            <span class="text-xs text-muted-foreground" id="noteSubjectBadge">— Toán học</span>
+          </div>
+          <span class="text-[11px] text-muted-foreground flex items-center gap-1">
+            <i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Đã tự động lưu
+          </span>
+        </div>
+
+        <div class="flex-1 grid grid-cols-12 gap-3 overflow-hidden">
+          
+          <div class="col-span-4 flex flex-col gap-2 border-r border-white/10 pr-2 overflow-hidden">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Danh mục bài</span>
+              <button onclick="createNewLesson()" class="text-xs text-foreground hover:text-amber-300 transition-colors p-1" title="Thêm bài mới">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="lessonList" class="flex-1 overflow-y-auto flex flex-col gap-1.5 scrollbar-none pr-1"></div>
+          </div>
+
+          <div class="col-span-8 flex flex-col h-full pl-1">
+            <div class="flex items-center justify-between mb-2">
+              <input
+                type="text"
+                id="currentLessonTitleInput"
+                placeholder="Tiêu đề bài học..."
+                class="bg-transparent text-sm font-semibold text-foreground focus:outline-none focus:border-b focus:border-white/30 flex-1 truncate mr-2 placeholder:text-muted-foreground"
+              />
+              <button id="btnDeleteLesson" onclick="deleteCurrentLesson()" class="text-muted-foreground hover:text-rose-400 p-1 transition-colors" title="Xóa bài này">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <textarea
+              id="currentLessonContentTextarea"
+              placeholder="Ghi lại công thức, mẹo làm bài, dàn ý chi tiết cho bài học này..."
+              class="w-full flex-1 p-3.5 bg-black/20 rounded-2xl border border-white/10 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 resize-none leading-relaxed"
+            ></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="col-span-12 lg:col-span-5 flex flex-col gap-4 overflow-hidden">
+        
+        <div class="liquid-glass rounded-3xl p-5 flex-1 flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2 text-sm font-medium text-foreground">
+              <i data-lucide="link" class="w-3.5 h-3.5 text-muted-foreground"></i>
+              <span>Tài Liệu & Link Drive</span>
+            </div>
+            <button onclick="toggleAddResourceForm()" class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              <i data-lucide="plus" class="w-3 h-3"></i> Thêm link
+            </button>
+          </div>
+
+          <form id="addResourceForm" class="hidden flex flex-col gap-2 mb-2 p-2.5 bg-black/20 rounded-2xl border border-white/10">
+            <input type="text" id="resourceTitleInput" placeholder="Tên tài liệu..." required class="px-3 py-1.5 text-xs bg-black/30 border border-white/10 rounded-xl text-foreground focus:outline-none focus:border-white/40" />
+            <input type="url" id="resourceUrlInput" placeholder="Dán link Google Drive..." required class="px-3 py-1.5 text-xs bg-black/30 border border-white/10 rounded-xl text-foreground focus:outline-none focus:border-white/40" />
+            <button type="submit" class="liquid-glass py-1.5 rounded-xl text-xs text-foreground font-medium hover:scale-[1.01]">Lưu tài liệu</button>
+          </form>
+
+          <div id="resourceList" class="flex-1 overflow-y-auto pr-1 flex flex-col gap-1.5 scrollbar-none"></div>
+        </div>
+
+        <div class="liquid-glass rounded-3xl p-5 flex-1 flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2 text-sm font-medium text-foreground">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-muted-foreground"></i>
+              <span>Sơ Đồ Tư Duy</span>
+            </div>
+            <button onclick="toggleAddMindmapForm()" class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              <i data-lucide="plus" class="w-3 h-3"></i> Thêm ảnh
+            </button>
+          </div>
+
+          <form id="addMindmapForm" class="hidden flex flex-col gap-2 mb-2 p-2.5 bg-black/20 rounded-2xl border border-white/10">
+            <input type="text" id="mapTitleInput" placeholder="Tên sơ đồ..." required class="px-3 py-1.5 text-xs bg-black/30 border border-white/10 rounded-xl text-foreground focus:outline-none focus:border-white/40" />
+            <input type="url" id="mapUrlInput" placeholder="Dán link ảnh sơ đồ..." required class="px-3 py-1.5 text-xs bg-black/30 border border-white/10 rounded-xl text-foreground focus:outline-none focus:border-white/40" />
+            <button type="submit" class="liquid-glass py-1.5 rounded-xl text-xs text-foreground font-medium hover:scale-[1.01]">Lưu sơ đồ</button>
+          </form>
+
+          <div id="mindmapGrid" class="flex-1 overflow-y-auto pr-1 grid grid-cols-2 gap-2 scrollbar-none"></div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <div id="drawerMenu" class="fixed inset-0 z-50 transition-all duration-500 invisible pointer-events-none">
+    <div id="drawerBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-500"></div>
+    <aside id="drawerPanel" class="absolute top-0 right-0 h-full w-full sm:w-[360px] p-6 flex flex-col justify-between transition-transform duration-500 translate-x-full border-l border-white/10 bg-[#001726]/90 backdrop-blur-2xl">
+      <div>
+        <div class="flex items-center justify-between pb-6 border-b border-white/10">
+          <div>
+            <p class="text-xs uppercase tracking-wider text-muted-foreground">Tài khoản cá nhân</p>
+            <p id="drawerUserDisplay" class="text-lg font-normal text-foreground mt-0.5" style="font-family: var(--font-display);">Học sinh</p>
+          </div>
+          <button id="btnCloseMenu" class="w-8 h-8 rounded-full liquid-glass flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="mt-6 flex flex-col gap-3">
+          <p class="text-xs uppercase tracking-wider text-muted-foreground font-semibold px-1">Chuyển nhanh môn học:</p>
+          <div id="drawerSubjectList" class="flex flex-col gap-1.5"></div>
+        </div>
+      </div>
+
+      <button id="btnLogout" class="liquid-glass rounded-full py-3.5 text-sm text-foreground font-medium flex items-center justify-center gap-2 hover:scale-[1.02] cursor-pointer">
+        <i data-lucide="log-out" class="w-4 h-4 text-muted-foreground"></i> Đổi tài khoản
+      </button>
+    </aside>
+  </div>
+
+  <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden">
+    <div class="liquid-glass rounded-3xl p-8 w-full max-w-md text-center bg-[#001726]/85 border border-white/15">
+      <h2 class="text-3xl font-normal text-foreground tracking-tight mb-2" style="font-family: var(--font-display);">
+        Velorah<sup class="text-xs">®</sup>
+      </h2>
+      <p class="text-sm text-muted-foreground mb-6">Nhập tên tài khoản để mở không gian học tập của riêng bạn</p>
+      
+      <form id="authForm" class="flex flex-col gap-3">
+        <input
+          type="text"
+          id="usernameInput"
+          placeholder="Tên của bạn (vd: vananh_11a7)"
+          required
+          class="px-4 py-3 rounded-2xl bg-black/30 border border-white/15 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/40"
+        />
+        <button type="submit" class="liquid-glass rounded-full py-3.5 text-sm text-foreground font-medium hover:scale-[1.02] cursor-pointer shadow-lg">
+          Bắt đầu hành trình
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SUBJECTS = [
+      { id: 'math', name: 'Toán học', icon: '📐', grade: '11' },
+      { id: 'physics', name: 'Vật lý', icon: '⚡', grade: '11' },
+      { id: 'chemistry', name: 'Hóa học', icon: '🧪', grade: '11' },
+      { id: 'literature', name: 'Ngữ văn', icon: '📚', grade: '11' },
+      { id: 'english', name: 'Tiếng Anh', icon: '🌍', grade: 'IELTS' },
+    ];
+
+    let currentUser = localStorage.getItem('velorah_user') || '';
+    let currentSubject = SUBJECTS[0];
+    let selectedLessonId = null;
+
+    // --- POMODORO TIMER ---
+    let totalMinutes = 25;
+    let totalSeconds = totalMinutes * 60;
+    let timeLeft = totalSeconds;
+    let timerInterval = null;
+    let isRunning = false;
+    let streak = parseInt(localStorage.getItem('velorah_streak') || '0', 10);
+
+    const timerMinutes = document.getElementById('timerMinutes');
+    const timerSeconds = document.getElementById('timerSeconds');
+    const playIcon = document.getElementById('playIcon');
+    const btnTimerText = document.getElementById('btnTimerText');
+    const streakCount = document.getElementById('streakCount');
+    streakCount.textContent = streak;
+
+    function updateTimerDisplay() {
+      timerMinutes.textContent = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      timerSeconds.textContent = String(timeLeft % 60).padStart(2, '0');
+    }
+
+    function editTimeDirectly() {
+      if (isRunning) return;
+      const val = parseInt(prompt("Nhập số phút tập trung mong muốn:", totalMinutes), 10);
+      if (!isNaN(val) && val > 0 && val <= 360) setCustomMinutes(val);
+    }
+
+    function setCustomMinutes(mins) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      playIcon.setAttribute('data-lucide', 'play');
+      btnTimerText.textContent = "Bắt đầu";
+      totalMinutes = mins;
+      totalSeconds = mins * 60;
+      timeLeft = totalSeconds;
+      updateTimerDisplay();
+      lucide.createIcons();
+    }
+
+    function adjustMinutes(delta) {
+      if (isRunning) return;
+      let m = totalMinutes + delta;
+      if (m < 1) m = 1;
+      setCustomMinutes(m);
+    }
+
+    document.getElementById('btnToggleTimer').addEventListener('click', () => {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        playIcon.setAttribute('data-lucide', 'play');
+        btnTimerText.textContent = "Tiếp tục";
+        isRunning = false;
+      } else {
+        timerInterval = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            streak++;
+            localStorage.setItem('velorah_streak', streak);
+            streakCount.textContent = streak;
+            alert("✨ Hoàn thành một hiệp tập trung tĩnh lặng!");
+            timeLeft = totalSeconds;
+            isRunning = false;
+            updateTimerDisplay();
+            playIcon.setAttribute('data-lucide', 'play');
+            btnTimerText.textContent = "Bắt đầu";
+            lucide.createIcons();
+          }
+        }, 1000);
+        playIcon.setAttribute('data-lucide', 'pause');
+        btnTimerText.textContent = "Đang đếm";
+        isRunning = true;
+      }
+      lucide.createIcons();
+    });
+
+    document.getElementById('btnResetTimer').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timeLeft = totalSeconds;
+      isRunning = false;
+      playIcon.setAttribute('data-lucide', 'play');
+      btnTimerText.textContent = "Bắt đầu";
+      updateTimerDisplay();
+      lucide.createIcons();
+    });
+
+    // --- LOCALSTORAGE TIỀN TỐ USER ---
+    function getUserKey(key) { return `velorah_${currentUser}_${key}`; }
+    function getData(key, fallback = []) {
+      const raw = localStorage.getItem(getUserKey(key));
+      return raw ? JSON.parse(raw) : fallback;
+    }
+    function setData(key, val) { localStorage.setItem(getUserKey(key), JSON.stringify(val)); }
+
+    // --- RENDER MÔN HỌC (LIQUID GLASS PILLS) ---
+    const subjectNavList = document.getElementById('subjectNavList');
+    const drawerSubjectList = document.getElementById('drawerSubjectList');
+
+    function renderSubjects() {
+      subjectNavList.innerHTML = '';
+      drawerSubjectList.innerHTML = '';
+
+      SUBJECTS.forEach((sub) => {
+        const isActive = sub.id === currentSubject.id;
+
+        // Desktop nav
+        const btn = document.createElement('button');
+        btn.className = `liquid-glass rounded-full px-4 py-1.5 text-xs text-foreground hover:scale-[1.03] cursor-pointer transition-all flex items-center gap-1.5 ${
+          isActive ? 'liquid-glass-active font-semibold' : 'text-muted-foreground'
+        }`;
+        btn.innerHTML = `<span>${sub.icon}</span><span>${sub.name}</span>`;
+        btn.onclick = () => selectSubject(sub);
+        subjectNavList.appendChild(btn);
+
+        // Drawer nav
+        const dBtn = document.createElement('button');
+        dBtn.className = `w-full text-left liquid-glass rounded-2xl px-4 py-2.5 text-xs text-foreground flex items-center justify-between ${
+          isActive ? 'liquid-glass-active' : ''
+        }`;
+        dBtn.innerHTML = `<span>${sub.icon} ${sub.name}</span><span class="text-[10px] text-muted-foreground">${sub.grade}</span>`;
+        dBtn.onclick = () => { selectSubject(sub); closeDrawer(); };
+        drawerSubjectList.appendChild(dBtn);
+      });
+    }
+
+    function selectSubject(sub) {
+      currentSubject = sub;
+      document.getElementById('currentSubjectTitle').textContent = sub.name;
+      document.getElementById('currentSubjectSub').textContent = sub.grade;
+      document.getElementById('subjectIconBadge').textContent = sub.icon;
+      document.getElementById('noteSubjectBadge').textContent = `— ${sub.name}`;
+      renderSubjects();
+      loadSubjectData();
+    }
+
+    // --- VỞ GHI CHÉP THEO TỪNG BÀI ---
+    const lessonListEl = document.getElementById('lessonList');
+    const lessonTitleInput = document.getElementById('currentLessonTitleInput');
+    const lessonContentTextarea = document.getElementById('currentLessonContentTextarea');
+
+    function loadLessons() {
+      const all = getData('lessons', []);
+      const cur = all.filter(l => l.subjectId === currentSubject.id);
+      lessonListEl.innerHTML = '';
+
+      if (cur.length === 0) {
+        const def = { id: Date.now().toString(), subjectId: currentSubject.id, title: 'Bài 1: Khởi động kiến thức', content: '' };
+        all.push(def);
+        setData('lessons', all);
+        selectedLessonId = def.id;
+        loadLessons();
+        return;
+      }
+
+      if (!cur.some(l => l.id === selectedLessonId)) selectedLessonId = cur[0].id;
+
+      cur.forEach((les) => {
+        const div = document.createElement('div');
+        const isActive = les.id === selectedLessonId;
+        div.className = `p-2 rounded-xl text-xs cursor-pointer truncate border transition-all ${
+          isActive ? 'bg-white/15 border-white/30 text-foreground font-medium' : 'bg-white/5 border-transparent text-muted-foreground hover:bg-white/10'
+        }`;
+        div.textContent = les.title || 'Chưa đặt tên';
+        div.onclick = () => { selectedLessonId = les.id; loadLessons(); };
+        lessonListEl.appendChild(div);
+      });
+
+      const activeLesson = cur.find(l => l.id === selectedLessonId);
+      if (activeLesson) {
+        lessonTitleInput.value = activeLesson.title || '';
+        lessonContentTextarea.value = activeLesson.content || '';
+      }
+    }
+
+    function createNewLesson() {
+      const all = getData('lessons', []);
+      const cur = all.filter(l => l.subjectId === currentSubject.id);
+      const newLes = { id: Date.now().toString(), subjectId: currentSubject.id, title: `Bài ${cur.length + 1}: Chuyên đề mới`, content: '' };
+      all.push(newLes);
+      setData('lessons', all);
+      selectedLessonId = newLes.id;
+      loadLessons();
+    }
+
+    function deleteCurrentLesson() {
+      if (!selectedLessonId || !confirm("Xóa bài học này?")) return;
+      let all = getData('lessons', []).filter(l => l.id !== selectedLessonId);
+      setData('lessons', all);
+      selectedLessonId = null;
+      loadLessons();
+    }
+
+    lessonTitleInput.addEventListener('input', () => {
+      if (!selectedLessonId) return;
+      const all = getData('lessons', []);
+      const cur = all.find(l => l.id === selectedLessonId);
+      if (cur) {
+        cur.title = lessonTitleInput.value;
+        setData('lessons', all);
+        const activeItem = lessonListEl.querySelector('.bg-white\\/15');
+        if (activeItem) activeItem.textContent = lessonTitleInput.value || 'Chưa đặt tên';
+      }
+    });
+
+    lessonContentTextarea.addEventListener('input', () => {
+      if (!selectedLessonId) return;
+      const all = getData('lessons', []);
+      const cur = all.find(l => l.id === selectedLessonId);
+      if (cur) {
+        cur.content = lessonContentTextarea.value;
+        setData('lessons', all);
+      }
+    });
+
+    // --- TÀI LIỆU DRIVE ---
+    function toggleAddResourceForm() { document.getElementById('addResourceForm').classList.toggle('hidden'); }
+    function renderResources() {
+      const all = getData('resources', []).filter(r => r.subjectId === currentSubject.id);
+      const list = document.getElementById('resourceList');
+      list.innerHTML = all.length === 0 ? `<div class="py-6 text-center text-muted-foreground text-xs">Chưa có liên kết Drive.</div>` : '';
+
+      all.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'p-2 bg-black/20 rounded-xl border border-white/5 flex items-center justify-between text-xs hover:border-white/20 transition-all';
+        row.innerHTML = `
+          <a href="${item.url}" target="_blank" class="truncate flex-1 text-foreground/90 hover:text-amber-300 flex items-center gap-1.5">
+            <i data-lucide="external-link" class="w-3 h-3 text-muted-foreground"></i><span class="truncate">${item.title}</span>
+          </a>
+          <button onclick="deleteResource('${item.id}')" class="text-muted-foreground hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+        `;
+        list.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('addResourceForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('resourceTitleInput');
+      const url = document.getElementById('resourceUrlInput');
+      const all = getData('resources', []);
+      all.push({ id: Date.now().toString(), subjectId: currentSubject.id, title: title.value.trim(), url: url.value.trim() });
+      setData('resources', all);
+      title.value = ''; url.value = '';
+      toggleAddResourceForm();
+      renderResources();
+    });
+
+    function deleteResource(id) {
+      setData('resources', getData('resources', []).filter(r => r.id !== id));
+      renderResources();
+    }
+
+    // --- SƠ ĐỒ TƯ DUY ---
+    function toggleAddMindmapForm() { document.getElementById('addMindmapForm').classList.toggle('hidden'); }
+    function renderMindmaps() {
+      const all = getData('mindmaps', []).filter(m => m.subjectId === currentSubject.id);
+      const grid = document.getElementById('mindmapGrid');
+      grid.innerHTML = all.length === 0 ? `<div class="col-span-full py-6 text-center text-muted-foreground text-xs">Chưa có ảnh sơ đồ.</div>` : '';
+
+      all.forEach(map => {
+        const c = document.createElement('div');
+        c.className = 'bg-black/30 rounded-xl border border-white/10 overflow-hidden relative group';
+        c.innerHTML = `
+          <div class="h-14 bg-black/40 overflow-hidden flex items-center justify-center">
+            <img src="${map.url}" alt="${map.title}" class="w-full h-full object-cover group-hover:scale-105 transition-all" onerror="this.src='https://images.unsplash.com/photo-1544717305-2782549b5136?w=400';" />
+            <a href="${map.url}" target="_blank" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-medium text-white transition-opacity">Xem ↗</a>
+          </div>
+          <div class="p-1.5 flex items-center justify-between text-[10px]">
+            <span class="truncate text-muted-foreground">${map.title}</span>
+            <button onclick="deleteMindmap('${map.id}')" class="text-muted-foreground hover:text-rose-400 p-0.5"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+          </div>
+        `;
+        grid.appendChild(c);
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('addMindmapForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('mapTitleInput');
+      const url = document.getElementById('mapUrlInput');
+      const all = getData('mindmaps', []);
+      all.push({ id: Date.now().toString(), subjectId: currentSubject.id, title: title.value.trim(), url: url.value.trim() });
+      setData('mindmaps', all);
+      title.value = ''; url.value = '';
+      toggleAddMindmapForm();
+      renderMindmaps();
+    });
+
+    function deleteMindmap(id) {
+      setData('mindmaps', getData('mindmaps', []).filter(m => m.id !== id));
+      renderMindmaps();
+    }
+
+    function loadSubjectData() {
+      renderResources();
+      loadLessons();
+      renderMindmaps();
+    }
+
+    // --- DRAWER & AUTH ---
+    const drawerMenu = document.getElementById('drawerMenu');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const drawerPanel = document.getElementById('drawerPanel');
+
+    function openDrawer() {
+      drawerMenu.classList.remove('invisible', 'pointer-events-none');
+      setTimeout(() => {
+        drawerBackdrop.classList.add('opacity-100');
+        drawerPanel.classList.remove('translate-x-full');
+      }, 10);
+    }
+    function closeDrawer() {
+      drawerBackdrop.classList.remove('opacity-100');
+      drawerPanel.classList.add('translate-x-full');
+      setTimeout(() => drawerMenu.classList.add('invisible', 'pointer-events-none'), 500);
+    }
+
+    document.getElementById('btnCloseMenu').addEventListener('click', closeDrawer);
+    drawerBackdrop.addEventListener('click', closeDrawer);
+
+    const authScreen = document.getElementById('authScreen');
+    const authForm = document.getElementById('authForm');
+    const usernameInput = document.getElementById('usernameInput');
+
+    function checkAuth() {
+      if (!currentUser) {
+        authScreen.classList.remove('hidden');
+      } else {
+        authScreen.classList.add('hidden');
+        document.getElementById('userBadgeText').textContent = currentUser;
+        document.getElementById('drawerUserDisplay').textContent = currentUser;
+        renderSubjects();
+        loadSubjectData();
+      }
+    }
+
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = usernameInput.value.trim();
+      if (val) {
+        currentUser = val;
+        localStorage.setItem('velorah_user', val);
+        checkAuth();
+      }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      localStorage.removeItem('velorah_user');
+      currentUser = '';
+      closeDrawer();
+      checkAuth();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      updateTimerDisplay();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
